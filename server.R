@@ -104,7 +104,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  output$heatmap <- renderPlot({
+  output$heatmap <- renderPlotly({
     
     femaDataState <- subset(femaData, EventDate > input$DateRange[1] & EventDate < input$DateRange[2]) %>%
       filter(Incident.Type %in% input$Types) %>%
@@ -133,7 +133,7 @@ shinyServer(function(input, output, session) {
       scale_fill_gradientn(colours=rev(heat.colors(10)),na.value="grey90")+
       coord_map()
     
-    return(print(heatmap))
+    return(ggplotly(heatmap))
   })
   
   output$bargraph <- renderPlotly({
