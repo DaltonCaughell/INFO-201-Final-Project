@@ -14,38 +14,54 @@ library(maps)
 library(mapproj)
 library(leaflet)
 
-shinyUI(fluidPage(
+shinyUI(navbarPage("Natural Disaster Information",
   
   # Application title
-  titlePanel("Natural Disaster Information"),
-  br(),
-  
-
-  sidebarLayout(sidebarPanel(
-    dateRangeInput("DateRange", "Show Data From", "1950-01-01"),
-    actionButton("Uncheck", label="Clear Filters"),
-    br(),
-    br(),
-    uiOutput("DisasterTypes")
-  ),
-
-  
-  mainPanel(
-    h1("Quick Info"),
-    br(),
-    textOutput("summary1"),
-    br(),
-    textOutput("summary2"),
-    br(),
-    h1("Number of Disasters by State"),
-    plotOutput("heatmap"),
-    br(),
-    h1("State Information"),
-    uiOutput("States"),
-    plotlyOutput("bargraph"),
-    br(),
-    br()
+  #titlePanel("Natural Disaster Information"),
+  #br(),
+  tabPanel(
+    "United States",
+    sidebarLayout(
+      sidebarPanel(
+        dateRangeInput("DateRange", "Show Data From", "1950-01-01"),
+        actionButton("Uncheck", label="Clear Filters"),
+        br(),
+        br(),
+        uiOutput("DisasterTypes")
+      ),
+      mainPanel(
+        h1("Quick Info"),
+        br(),
+        textOutput("summary1"),
+        br(),
+        textOutput("summary2"),
+        br(),
+        h1("Number of Disasters by State"),
+        br(),
+        plotOutput("heatmap"),
+        br(),
+        h1("State Information"),
+        br(),
+        uiOutput("States"),
+        br(),
+        plotlyOutput("bargraph"),
+        br(),
+        br()
+      )
   )
-  
-  ))
+  ),
+  tabPanel(
+    "World",
+    sidebarLayout(
+      sidebarPanel(
+        uiOutput("countrys"),
+        hr(),
+        helpText("Pick a country")
+      ),
+      mainPanel(
+        plotOutput("worldplot")
+      )
+    )
+  )
+  )
 )

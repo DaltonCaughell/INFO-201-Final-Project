@@ -15,14 +15,26 @@ library(maps)
 library(mapproj)
 library(zipcode)
 library(leaflet)
+library(ggmap)
 
-# Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
 
+  # FEMA Data INIT
   femaData <- data.frame(read.csv("data/fema_data.csv"))
-  
   femaData$EventDate <- as.Date(femaData$Incident.Begin.Date, format="%m/%d/%Y")
   
+  # World Data INIT
+  world.data <- data.frame(read.csv("data/natdisdata.csv", col.names = c("year", "iso", 'country.name', 'disaster.type', 'occurrences', 'deaths', 'injured', 'affected', 'homeless', 'total.affected', 'total.damage')))
+  world.data <- world.data[-c(1),]
+  world.data <- world.data %>% group_by(country.name) %>%
+    summarise(occurrences = sum(occurrences), deaths = sum(deaths), injured = sum(injured), affected = sum(affected), homeless = sum(homeless), total.affected = sum(total.affected), total.damage = sum(total.damage))
+  world.data <- world.data[-c(1),]
+  world.data$country.names <- sub(" \\(.*", " ", world.data$country.name)
+  world.data <- world.data[-c(1)]
+  world.data <- world.data[-c(13, 32, 37, 74, 75, 159, 182, 218, 219),]
+  world.data$location <- geocode(world.data$country.names)
+  
+  # Observe for Clear Checkbox
   observe({
     if (input$Uncheck > 0) {
       data <- subset(femaData, EventDate > input$DateRange[1] & EventDate < input$DateRange[2]) %>% 
@@ -33,6 +45,30 @@ shinyServer(function(input, output, session) {
       
       updateCheckboxGroupInput(session, "Types", "Disaster Type(s)", choices=data$Incident.Type)
     }
+  })
+  
+  ### United States Page ###
+  
+  output$States <- renderUI({
+    
+    data <- subset(femaData, EventDate > input$DateRange[1] & EventDate < input$DateRange[2]) %>% 
+      group_by(State) %>% 
+      summarise(count=n()) %>%
+      filter(State != "") %>%
+      select(State)
+    
+    return(selectInput("State", "Choose State", choices=data$State))
+  })
+  
+  output$DisasterTypes <- renderUI({
+    
+    data <- subset(femaData, EventDate > input$DateRange[1] & EventDate < input$DateRange[2]) %>% 
+      group_by(Incident.Type) %>% 
+      summarise(count=n()) %>%
+      filter(Incident.Type != "") %>%
+      select(Incident.Type)
+    
+    return(checkboxGroupInput("Types", "Disaster Type(s)", choices=data$Incident.Type, selected=data$Incident.Type))
   })
   
   output$summary1 <- renderText({
@@ -65,28 +101,6 @@ shinyServer(function(input, output, session) {
     } else {
       return()
     }
-  })
-  
-  output$States <- renderUI({
-    
-    data <- subset(femaData, EventDate > input$DateRange[1] & EventDate < input$DateRange[2]) %>% 
-      group_by(State) %>% 
-      summarise(count=n()) %>%
-      filter(State != "") %>%
-      select(State)
-    
-    return(selectInput("State", "Choose State", choices=data$State))
-  })
-  
-  output$DisasterTypes <- renderUI({
-    
-    data <- subset(femaData, EventDate > input$DateRange[1] & EventDate < input$DateRange[2]) %>% 
-      group_by(Incident.Type) %>% 
-      summarise(count=n()) %>%
-      filter(Incident.Type != "") %>%
-      select(Incident.Type)
-    
-    return(checkboxGroupInput("Types", "Disaster Type(s)", choices=data$Incident.Type, selected=data$Incident.Type))
   })
   
   output$heatmap <- renderPlot({
@@ -136,6 +150,20 @@ shinyServer(function(input, output, session) {
     layout(yaxis=list(title="# Of Occurrences"),xaxis=list(title="Incident Type"))
     
     return(p)
+  })
+  
+  ### World Page ###
+  output$countrys <- renderUI({
+    return(selectInput("country", "Country:", choices=world.data[['country.names']]))
+  })
+  
+  output$worldplot <- renderPlot({
+    data <- world.data %>%
+      filter(country.names == input$country) %>%
+      select(1, 2, 3, 4, 5, 6, 7)
+    barplot(unname(unlist(data[1,])), width = 2, names.arg = colnames(data),
+            main = input$country,
+            xlab = "Affects")
   })
   
 })
