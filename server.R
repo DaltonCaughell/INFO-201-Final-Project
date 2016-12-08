@@ -35,6 +35,9 @@ shinyServer(function(input, output, session) {
   #world.data$location <- geocode(world.data$country.names)
   world.data <- data.frame(read.csv("data/world.csv"))
   
+  
+  ### United States Page ###
+  
   # Observe for Clear Checkbox
   observe({
     if (input$Uncheck > 0) {
@@ -47,8 +50,6 @@ shinyServer(function(input, output, session) {
       updateCheckboxGroupInput(session, "Types", "Disaster Type(s)", choices=data$Incident.Type)
     }
   })
-  
-  ### United States Page ###
   
   output$States <- renderUI({
     
@@ -157,6 +158,7 @@ shinyServer(function(input, output, session) {
   })
   
   ### World Page ###
+  
   output$countrys <- renderUI({
     return(selectInput("country", "Country:", choices=world.data[['country.names']]))
   })
