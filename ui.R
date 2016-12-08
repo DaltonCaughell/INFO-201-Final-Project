@@ -55,11 +55,12 @@ shinyUI(navbarPage("Natural Disaster Information",
     sidebarLayout(
       sidebarPanel(
         uiOutput("countrys"),
+        uiOutput("countrys2"),
         hr(),
-        helpText("Pick a country")
+        helpText("Pick two country to compare statistics")
       ),
       mainPanel(
-        h1("Natural Disaster Statistics by Country 1900-Present"),
+        h1("Disaster Statistics by Country 1900-Present"),
         plotlyOutput("worldplot")
       )
     )
