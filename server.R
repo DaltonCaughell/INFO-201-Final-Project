@@ -167,11 +167,11 @@ shinyServer(function(input, output, session) {
     return(selectInput("country2", "2nd Country:", choices=world.data[['country.names']]))
   })
   
-  output$worldplot <- renderPlotly({
+  output$worldbarplot <- renderPlotly({
     
     data <- world.data %>%
       filter(country.names %in% c(paste(input$country), paste(input$country2))) %>%
-      select(2, 3, 4, 6, 7, 8)
+      select(2, 3, 4, 6)
     
     p <- plot_ly(data =  data,
                  x = colnames(data),
@@ -180,7 +180,16 @@ shinyServer(function(input, output, session) {
                  type = "bar") %>%
                  add_trace(y = unname(unlist(data[2,])), name = input$country2) %>%
                  layout(yaxis=list(title="Number Of Occurrences"),xaxis=list(title="Affects"))
+    return(p)
+  })
+  
+  output$worldscatterplot <- renderPlotly({
     
+    p <- plot_ly(type = "scattergeo",
+            lon = world.data$location.lon,
+            lat = world.data$location.lat,
+            text = paste(world.data$country.names, paste("Total Affected:", world.data$total.affected), paste("Total Damage:", world.data$total.damage), sep = "<br />"),
+            mode = 'markers') 
     return(p)
   })
   
