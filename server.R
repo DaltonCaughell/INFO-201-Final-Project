@@ -123,6 +123,7 @@ shinyServer(function(input, output, session) {
     map.df$state.name <- tolower(map.df$state.name)
     
     map.df <- merge(states,map.df, by.x="region", by.y="state.name", all.x=T)
+    map.df <- map.df[order(map.df$order),]
     
     heatmap <- ggplot(map.df, aes(x=long,y=lat,group=group))+
       geom_polygon(aes(fill=count))+
