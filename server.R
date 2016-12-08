@@ -163,13 +163,20 @@ shinyServer(function(input, output, session) {
     return(selectInput("country", "Country:", choices=world.data[['country.names']]))
   })
   
-  output$worldplot <- renderPlot({
+  output$worldplot <- renderPlotly({
+    
     data <- world.data %>%
       filter(country.names == input$country) %>%
-      select(1, 2, 3, 4, 5, 6, 7)
-    barplot(unname(unlist(data[1,])), width = 2, names.arg = colnames(data),
-            main = input$country,
-            xlab = "Affects")
+      select(2, 3, 4, 6, 7, 8)
+    
+    p <- plot_ly(data =  data,
+                 x = colnames(data),
+                 y = unname(unlist(data[1,])),
+                 name = paste0("Natural Disaster by Country"),
+                 type = "bar") %>%
+                 layout(yaxis=list(title="Number Of Occurrences"),xaxis=list(title="Affects"))
+    
+    return(p)
   })
   
 })

@@ -59,7 +59,8 @@ shinyUI(navbarPage("Natural Disaster Information",
         helpText("Pick a country")
       ),
       mainPanel(
-        plotOutput("worldplot")
+        h1("Natural Disaster Statistics by Country 1900-Present"),
+        plotlyOutput("worldplot")
       )
     )
   )
