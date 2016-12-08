@@ -11,11 +11,11 @@ world.data$location <- geocode(world.data$country.names)
 
 
 function(input, output) {
-  data <- world.data %>%
-    filter(country.names == input$country) %>%
-    select(1, 2, 3, 4, 5, 6, 7)
   output$plot <- renderPlot({
-    barplot(data,
+    data <- world.data %>%
+      filter(country.names == input$country) %>%
+      select(1, 2, 3, 4, 5, 6, 7)
+    barplot(unname(unlist(data[1,])), width = 2, names.arg = colnames(data),
             main = input$country,
             xlab = "Affects")
   })

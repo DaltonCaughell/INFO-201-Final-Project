@@ -1,4 +1,3 @@
-
 fluidPage(    
   titlePanel("Natural Disasters"),
   sidebarLayout(      
@@ -6,10 +5,9 @@ fluidPage(
       selectInput("country", "Country:", choices=world.data[['country.names']]),
       hr(),
       helpText("Pick a country")
+    ),
+    mainPanel(
+      plotOutput("plot")  
     )
-  ),
-  
-  mainPanel(
-    plotOutput("plot")  
   )
 )
