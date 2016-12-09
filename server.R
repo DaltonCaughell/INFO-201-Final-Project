@@ -17,6 +17,9 @@ library(zipcode)
 library(leaflet)
 library(ggmap)
 
+# Disasters Data INIT
+DisasterData <- data.frame(read.csv("data/disasters.csv"))
+
 shinyServer(function(input, output, session) {
 
   # FEMA Data INIT
@@ -185,12 +188,14 @@ shinyServer(function(input, output, session) {
   
   ### Disasters Page ###
   
+  output$DDisasterTypes <- renderUI({
+    return(selectInput("indicatorInput", "Disaster Type",choices = levels(DisasterData$disaster.type)[-c(1,7,8)]))
+  })
+  
   # Expression that generates a histogram. The expression is
   # wrapped in a call to renderPlot to indicate that:
   
   output$summary<- renderPrint({
-    # Disasters Data INIT
-    DisasterData <- data.frame(read.csv("data/disasters.csv"))
     filtered <- DisasterData %>% 
       filter(disaster.type == input$indicatorInput)
     print(summary(filtered$Total.deaths))
@@ -198,8 +203,6 @@ shinyServer(function(input, output, session) {
   })
   
   output$distPlot <- renderPlot({
-    # Disasters Data INIT
-    DisasterData <- data.frame(read.csv("data/disasters.csv"))
     # if(input$indicatorInput == "Animal accident"){
     # x    <- dat[dat$disaster.type=='Animal accident',]
     # bins <- seq(min(x), max(x), length.out = input$bins + 20)

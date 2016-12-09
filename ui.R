@@ -77,7 +77,7 @@ shinyUI(navbarPage("Natural Disaster Information",
                     min = 1,
                     max = 50,
                     value = 30),
-        selectInput("indicatorInput", "Disaster Type",choices = levels(dat$disaster.type)[-c(1,7,8)])
+        uiOutput("DDisasterTypes")
       ),
       
       # Show a plot of the generated distribution
